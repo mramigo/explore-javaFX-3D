@@ -58,8 +58,6 @@ private Timeline timeline;
 boolean timelinePlaying = false;
 double mousePosX;
 double mousePosY;
-double mouseDeltaX;
-double mouseDeltaY;
 
 private void buildScene() {
   root.getChildren().add(world);
@@ -170,8 +168,8 @@ private void handleMouse(Scene scene, final Node root, Camera camera) {
     double mouseOldY = mousePosY;
     mousePosX = me.getSceneX();
     mousePosY = me.getSceneY();
-    mouseDeltaX = (mousePosX - mouseOldX);
-    mouseDeltaY = (mousePosY - mouseOldY);
+    double mouseDeltaX = (mousePosX - mouseOldX);
+    double mouseDeltaY = (mousePosY - mouseOldY);
 
     double modifier = 1.0;
     double modifierFactor = 0.1;
