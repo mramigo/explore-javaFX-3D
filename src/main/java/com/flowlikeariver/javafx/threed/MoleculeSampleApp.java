@@ -190,17 +190,17 @@ private void handleMouse(Scene scene, final Node root, Camera camera) {
       modifier = 10.0;
     }
     if (me.isPrimaryButtonDown()) {
-      camera.getXform1().ry.setAngle(camera.getXform1().ry.getAngle() - mouseDeltaX * modifierFactor * modifier * 2.0);  // +
-      camera.getXform1().rx.setAngle(camera.getXform1().rx.getAngle() + mouseDeltaY * modifierFactor * modifier * 2.0);  // -
+      camera.getXform1()
+        .adjustRy(-mouseDeltaX * modifierFactor * modifier * 2.0)
+        .adjustRx(mouseDeltaY * modifierFactor * modifier * 2.0);
     }
     else if (me.isSecondaryButtonDown()) {
-      double z = camera.getPerspectiveCamera().getTranslateZ();
-      double newZ = z + mouseDeltaX * modifierFactor * modifier;
-      camera.getPerspectiveCamera().setTranslateZ(newZ);
+      camera.adjustCameraZ(mouseDeltaX * modifierFactor * modifier);
     }
     else if (me.isMiddleButtonDown()) {
-      camera.getXform2().adjustTx(mouseDeltaX * modifierFactor * modifier * 0.3);  // -
-      camera.getXform2().adjustTy(mouseDeltaY * modifierFactor * modifier * 0.3);  // -
+      camera.getXform2()
+        .adjustTx(mouseDeltaX * modifierFactor * modifier * 0.3)
+        .adjustTy(mouseDeltaY * modifierFactor * modifier * 0.3);
     }
   });
 }
@@ -210,12 +210,10 @@ private void handleKeyboard(Scene scene, final Node root, Camera camera) {
     switch (event.getCode()) {
       case Z:
         if (event.isShiftDown()) {
-          camera.getXform1().ry.setAngle(0.0);
-          camera.getXform1().rx.setAngle(0.0);
+          camera.getXform1().setRy(0.0).setRx(0.0);
           camera.getPerspectiveCamera().setTranslateZ(-300.0);
         }
-        camera.getXform2().setTx(0.0);
-        camera.getXform2().setTy(0.0);
+        camera.getXform2().setTx(0.0).setTy(0.0);
         break;
       case X:
         if (event.isControlDown()) {
@@ -241,18 +239,16 @@ private void handleKeyboard(Scene scene, final Node root, Camera camera) {
           camera.getXform2().adjustTy(-10.0 * CONTROL_MULTIPLIER);
         }
         else if (event.isAltDown() && event.isShiftDown()) {
-          camera.getXform1().rx.setAngle(camera.getXform1().rx.getAngle() - 10.0 * ALT_MULTIPLIER);
+          camera.getXform1().adjustRx(-10.0 * ALT_MULTIPLIER);
         }
         else if (event.isControlDown()) {
           camera.getXform2().adjustTy(-1.0 * CONTROL_MULTIPLIER);
         }
         else if (event.isAltDown()) {
-          camera.getXform1().rx.setAngle(camera.getXform1().rx.getAngle() - 2.0 * ALT_MULTIPLIER);
+          camera.getXform1().adjustRx(-2.0 * ALT_MULTIPLIER);
         }
         else if (event.isShiftDown()) {
-          double z = camera.getPerspectiveCamera().getTranslateZ();
-          double newZ = z + 5.0 * SHIFT_MULTIPLIER;
-          camera.getPerspectiveCamera().setTranslateZ(newZ);
+          camera.adjustCameraZ(5.0 * SHIFT_MULTIPLIER);
         }
         break;
       case DOWN:
@@ -260,18 +256,16 @@ private void handleKeyboard(Scene scene, final Node root, Camera camera) {
           camera.getXform2().adjustTy(10.0 * CONTROL_MULTIPLIER);
         }
         else if (event.isAltDown() && event.isShiftDown()) {
-          camera.getXform1().rx.setAngle(camera.getXform1().rx.getAngle() + 10.0 * ALT_MULTIPLIER);
+          camera.getXform1().adjustRx(10.0 * ALT_MULTIPLIER);
         }
         else if (event.isControlDown()) {
           camera.getXform2().adjustTy(1.0 * CONTROL_MULTIPLIER);
         }
         else if (event.isAltDown()) {
-          camera.getXform1().rx.setAngle(camera.getXform1().rx.getAngle() + 2.0 * ALT_MULTIPLIER);
+          camera.getXform1().adjustRx(2.0 * ALT_MULTIPLIER);
         }
         else if (event.isShiftDown()) {
-          double z = camera.getPerspectiveCamera().getTranslateZ();
-          double newZ = z - 5.0 * SHIFT_MULTIPLIER;
-          camera.getPerspectiveCamera().setTranslateZ(newZ);
+          camera.adjustCameraZ(-5.0 * SHIFT_MULTIPLIER);
         }
         break;
       case RIGHT:
@@ -279,13 +273,13 @@ private void handleKeyboard(Scene scene, final Node root, Camera camera) {
           camera.getXform2().adjustTx(10.0 * CONTROL_MULTIPLIER);
         }
         else if (event.isAltDown() && event.isShiftDown()) {
-          camera.getXform1().ry.setAngle(camera.getXform1().ry.getAngle() - 10.0 * ALT_MULTIPLIER);
+          camera.getXform1().adjustRy(-10.0 * ALT_MULTIPLIER);
         }
         else if (event.isControlDown()) {
           camera.getXform2().adjustTx(1.0 * CONTROL_MULTIPLIER);
         }
         else if (event.isAltDown()) {
-          camera.getXform1().ry.setAngle(camera.getXform1().ry.getAngle() - 2.0 * ALT_MULTIPLIER);
+          camera.getXform1().adjustRy(-2.0 * ALT_MULTIPLIER);
         }
         break;
       case LEFT:
@@ -293,13 +287,13 @@ private void handleKeyboard(Scene scene, final Node root, Camera camera) {
           camera.getXform2().adjustTx(-10.0 * CONTROL_MULTIPLIER);
         }
         else if (event.isAltDown() && event.isShiftDown()) {
-          camera.getXform1().ry.setAngle(camera.getXform1().ry.getAngle() + 10.0 * ALT_MULTIPLIER);  // -
+          camera.getXform1().adjustRy(10.0 * ALT_MULTIPLIER);  // -
         }
         else if (event.isControlDown()) {
           camera.getXform2().adjustTx(-1.0 * CONTROL_MULTIPLIER);
         }
         else if (event.isAltDown()) {
-          camera.getXform1().ry.setAngle(camera.getXform1().ry.getAngle() + 2.0 * ALT_MULTIPLIER);  // -
+          camera.getXform1().adjustRy(2.0 * ALT_MULTIPLIER);  // -
         }
         break;
     }

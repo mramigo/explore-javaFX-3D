@@ -26,8 +26,8 @@ public Camera(Group root) {
   pc.setNearClip(0.1);
   pc.setFarClip(10000.0);
   pc.setTranslateZ(-cameraDistance);
-  xForm1.ry.setAngle(320.0);
-  xForm1.rx.setAngle(40);
+  xForm1.setRotateY(320.0);
+  xForm1.setRotateX(40);
 }
 
 /**
@@ -49,6 +49,10 @@ public Xform getXform1() {
  */
 public Xform getXform2() {
   return xForm2;
+}
+
+public void adjustCameraZ(double delta) {
+  pc.setTranslateZ(pc.getTranslateZ() + delta);
 }
 
 }

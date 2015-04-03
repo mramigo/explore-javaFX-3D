@@ -47,30 +47,22 @@ XYZ, XZY, YXZ, YZX, ZXY, ZYX
 private Translate t = new Translate();
 public Translate p = new Translate();
 public Translate ip = new Translate();
-public Rotate rx = new Rotate();
 
-{
-  rx.setAxis(Rotate.X_AXIS);
-}
-public Rotate ry = new Rotate();
+private Rotate rx = new Rotate();
+private Rotate ry = new Rotate();
+private Rotate rz = new Rotate();
 
-{
-  ry.setAxis(Rotate.Y_AXIS);
-}
-public Rotate rz = new Rotate();
-
-{
-  rz.setAxis(Rotate.Z_AXIS);
-}
 public Scale s = new Scale();
 
 public Xform() {
   super();
+  init();
   getTransforms().addAll(t, rz, ry, rx, s);
 }
 
 public Xform(RotateOrder rotateOrder) {
   super();
+  init();
   // choose the order of rotations based on the rotateOrder
   switch (rotateOrder) {
     case XYZ:
@@ -92,6 +84,12 @@ public Xform(RotateOrder rotateOrder) {
       getTransforms().addAll(t, p, rx, ry, rz, s, ip);
       break;
   }
+}
+
+private void init() { 
+  rx.setAxis(Rotate.X_AXIS);
+  rz.setAxis(Rotate.Z_AXIS);
+  ry.setAxis(Rotate.Y_AXIS);
 }
 
 public void setTranslate(double x, double y, double z) {
@@ -158,16 +156,34 @@ public void setRotateZ(double z) {
   rz.setAngle(z);
 }
 
-public void setRx(double x) {
+public Xform setRx(double x) {
   rx.setAngle(x);
+  return this;
 }
 
-public void setRy(double y) {
+public Xform adjustRx(double delta) {
+  rx.setAngle(rx.getAngle() + delta);
+  return this;
+}
+
+public Xform setRy(double y) {
   ry.setAngle(y);
+  return this;
 }
 
-public void setRz(double z) {
+public Xform adjustRy(double delta) {
+  ry.setAngle(ry.getAngle() + delta);
+  return this;
+}
+
+public Xform setRz(double z) {
   rz.setAngle(z);
+  return this;
+}
+
+public Xform adjustRz(double delta) {
+  rz.setAngle(rz.getAngle() + delta);
+  return this;
 }
 
 public void setScale(double scaleFactor) {
