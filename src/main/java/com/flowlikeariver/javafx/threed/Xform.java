@@ -44,7 +44,7 @@ public enum RotateOrder {
 XYZ, XZY, YXZ, YZX, ZXY, ZYX
 }
 
-public Translate t = new Translate();
+private Translate t = new Translate();
 public Translate p = new Translate();
 public Translate ip = new Translate();
 public Rotate rx = new Rotate();
@@ -110,16 +110,34 @@ public void setTranslate(double x, double y) {
 // public void setTranslateY(double y) { t.setY(y); }
 // public void setTranslateZ(double z) { t.setZ(z); }
 // Use these methods instead:
-public void setTx(double x) {
+public Xform setTx(double x) {
   t.setX(x);
+  return this;
 }
 
-public void setTy(double y) {
+public Xform adjustTx(double delta) {
+  t.setX(t.getX() + delta);
+  return this;
+}
+
+public Xform setTy(double y) {
   t.setY(y);
+  return this;
 }
 
-public void setTz(double z) {
+public Xform adjustTy(double delta) {
+  t.setY(t.getY() + delta);
+  return this;
+}
+
+public Xform setTz(double z) {
   t.setZ(z);
+  return this;
+}
+
+public Xform adjustTz(double delta) {
+  t.setZ(t.getX() + delta);
+  return this;
 }
 
 public void setRotate(double x, double y, double z) {

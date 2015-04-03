@@ -31,6 +31,9 @@
  */
 package com.flowlikeariver.javafx.threed;
 
+import static com.flowlikeariver.javafx.threed.Camera.ALT_MULTIPLIER;
+import static com.flowlikeariver.javafx.threed.Camera.CONTROL_MULTIPLIER;
+import static com.flowlikeariver.javafx.threed.Camera.SHIFT_MULTIPLIER;
 import javafx.application.Application;
 import static javafx.application.Application.launch;
 import javafx.scene.Group;
@@ -56,11 +59,6 @@ final Xform world = new Xform();
 final Xform moleculeGroup = new Xform();
 private Timeline timeline;
 boolean timelinePlaying = false;
-double ONE_FRAME = 1.0 / 24.0;
-double DELTA_MULTIPLIER = 200.0;
-double CONTROL_MULTIPLIER = 0.1;
-double SHIFT_MULTIPLIER = 0.1;
-double ALT_MULTIPLIER = 0.5;
 double mousePosX;
 double mousePosY;
 double mouseOldX;
@@ -97,8 +95,19 @@ private void buildAxes() {
   world.add(axisGroup);
 }
 
+// Molecule Hierarchy
+// [*] moleculeXform
+//     [*] oxygenXform
+//         [*] oxygenSphere
+//     [*] hydrogen1SideXform
+//         [*] hydrogen1Xform
+//             [*] hydrogen1Sphere
+//         [*] bond1Cylinder
+//     [*] hydrogen2SideXform
+//         [*] hydrogen2Xform
+//             [*] hydrogen2Sphere
+//         [*] bond2Cylinder
 private void buildMolecule() {
-
   final PhongMaterial redMaterial = new PhongMaterial();
   redMaterial.setDiffuseColor(Color.DARKRED);
   redMaterial.setSpecularColor(Color.RED);
@@ -110,25 +119,6 @@ private void buildMolecule() {
   final PhongMaterial greyMaterial = new PhongMaterial();
   greyMaterial.setDiffuseColor(Color.DARKGREY);
   greyMaterial.setSpecularColor(Color.GREY);
-
-  // Molecule Hierarchy
-  // [*] moleculeXform
-  //     [*] oxygenXform
-  //         [*] oxygenSphere
-  //     [*] hydrogen1SideXform
-  //         [*] hydrogen1Xform
-  //             [*] hydrogen1Sphere
-  //         [*] bond1Cylinder
-  //     [*] hydrogen2SideXform
-  //         [*] hydrogen2Xform
-  //             [*] hydrogen2Sphere
-  //         [*] bond2Cylinder
-  Xform moleculeXform = new Xform();
-  Xform oxygenXform = new Xform();
-  Xform hydrogen1SideXform = new Xform();
-  Xform hydrogen1Xform = new Xform();
-  Xform hydrogen2SideXform = new Xform();
-  Xform hydrogen2Xform = new Xform();
 
   Sphere oxygenSphere = new Sphere(40.0);
   oxygenSphere.setMaterial(redMaterial);
@@ -147,26 +137,30 @@ private void buildMolecule() {
   bond1Cylinder.setRotationAxis(Rotate.Z_AXIS);
   bond1Cylinder.setRotate(90.0);
 
+  Xform oxygenXform = new Xform();
+  oxygenXform.add(oxygenSphere);
+
+  Xform hydrogen1Xform = new Xform();
+  hydrogen1Xform.add(hydrogen1Sphere);
+  hydrogen1Xform.setTx(100.0);
+  Xform hydrogen1SideXform = new Xform();
+  hydrogen1SideXform.add(hydrogen1Xform).add(bond1Cylinder);
+
   Cylinder bond2Cylinder = new Cylinder(5, 100);
   bond2Cylinder.setMaterial(greyMaterial);
   bond2Cylinder.setTranslateX(50.0);
   bond2Cylinder.setRotationAxis(Rotate.Z_AXIS);
   bond2Cylinder.setRotate(90.0);
 
-  moleculeXform.add(oxygenXform).add(hydrogen1SideXform).add(hydrogen2SideXform);
-  oxygenXform.add(oxygenSphere);
-
-  hydrogen1Xform.add(hydrogen1Sphere);
-  hydrogen1Xform.setTx(100.0);
-  hydrogen1SideXform.add(hydrogen1Xform);
-  hydrogen1SideXform.add(bond1Cylinder);
-
+  Xform hydrogen2Xform = new Xform();
   hydrogen2Xform.add(hydrogen2Sphere);
   hydrogen2Xform.setTx(100.0);
-  hydrogen2SideXform.add(hydrogen2Xform);
-  hydrogen2SideXform.add(bond2Cylinder);
+  Xform hydrogen2SideXform = new Xform();
+  hydrogen2SideXform.add(hydrogen2Xform).add(bond2Cylinder);
   hydrogen2SideXform.setRotateY(104.5);
 
+  Xform moleculeXform = new Xform();
+  moleculeXform.add(oxygenXform).add(hydrogen1SideXform).add(hydrogen2SideXform);
   moleculeGroup.add(moleculeXform);
   world.add(moleculeGroup);
 }
@@ -196,8 +190,8 @@ private void handleMouse(Scene scene, final Node root, Camera camera) {
       modifier = 10.0;
     }
     if (me.isPrimaryButtonDown()) {
-      camera.getCameraXform().ry.setAngle(camera.getCameraXform().ry.getAngle() - mouseDeltaX * modifierFactor * modifier * 2.0);  // +
-      camera.getCameraXform().rx.setAngle(camera.getCameraXform().rx.getAngle() + mouseDeltaY * modifierFactor * modifier * 2.0);  // -
+      camera.getXform1().ry.setAngle(camera.getXform1().ry.getAngle() - mouseDeltaX * modifierFactor * modifier * 2.0);  // +
+      camera.getXform1().rx.setAngle(camera.getXform1().rx.getAngle() + mouseDeltaY * modifierFactor * modifier * 2.0);  // -
     }
     else if (me.isSecondaryButtonDown()) {
       double z = camera.getPerspectiveCamera().getTranslateZ();
@@ -205,8 +199,8 @@ private void handleMouse(Scene scene, final Node root, Camera camera) {
       camera.getPerspectiveCamera().setTranslateZ(newZ);
     }
     else if (me.isMiddleButtonDown()) {
-      camera.getCameraXform2().t.setX(camera.getCameraXform2().t.getX() + mouseDeltaX * modifierFactor * modifier * 0.3);  // -
-      camera.getCameraXform2().t.setY(camera.getCameraXform2().t.getY() + mouseDeltaY * modifierFactor * modifier * 0.3);  // -
+      camera.getXform2().adjustTx(mouseDeltaX * modifierFactor * modifier * 0.3);  // -
+      camera.getXform2().adjustTy(mouseDeltaY * modifierFactor * modifier * 0.3);  // -
     }
   });
 }
@@ -216,12 +210,12 @@ private void handleKeyboard(Scene scene, final Node root, Camera camera) {
     switch (event.getCode()) {
       case Z:
         if (event.isShiftDown()) {
-          camera.getCameraXform().ry.setAngle(0.0);
-          camera.getCameraXform().rx.setAngle(0.0);
+          camera.getXform1().ry.setAngle(0.0);
+          camera.getXform1().rx.setAngle(0.0);
           camera.getPerspectiveCamera().setTranslateZ(-300.0);
         }
-        camera.getCameraXform2().t.setX(0.0);
-        camera.getCameraXform2().t.setY(0.0);
+        camera.getXform2().setTx(0.0);
+        camera.getXform2().setTy(0.0);
         break;
       case X:
         if (event.isControlDown()) {
@@ -244,16 +238,16 @@ private void handleKeyboard(Scene scene, final Node root, Camera camera) {
         break;
       case UP:
         if (event.isControlDown() && event.isShiftDown()) {
-          camera.getCameraXform2().t.setY(camera.getCameraXform2().t.getY() - 10.0 * CONTROL_MULTIPLIER);
+          camera.getXform2().adjustTy(-10.0 * CONTROL_MULTIPLIER);
         }
         else if (event.isAltDown() && event.isShiftDown()) {
-          camera.getCameraXform().rx.setAngle(camera.getCameraXform().rx.getAngle() - 10.0 * ALT_MULTIPLIER);
+          camera.getXform1().rx.setAngle(camera.getXform1().rx.getAngle() - 10.0 * ALT_MULTIPLIER);
         }
         else if (event.isControlDown()) {
-          camera.getCameraXform2().t.setY(camera.getCameraXform2().t.getY() - 1.0 * CONTROL_MULTIPLIER);
+          camera.getXform2().adjustTy(-1.0 * CONTROL_MULTIPLIER);
         }
         else if (event.isAltDown()) {
-          camera.getCameraXform().rx.setAngle(camera.getCameraXform().rx.getAngle() - 2.0 * ALT_MULTIPLIER);
+          camera.getXform1().rx.setAngle(camera.getXform1().rx.getAngle() - 2.0 * ALT_MULTIPLIER);
         }
         else if (event.isShiftDown()) {
           double z = camera.getPerspectiveCamera().getTranslateZ();
@@ -263,16 +257,16 @@ private void handleKeyboard(Scene scene, final Node root, Camera camera) {
         break;
       case DOWN:
         if (event.isControlDown() && event.isShiftDown()) {
-          camera.getCameraXform2().t.setY(camera.getCameraXform2().t.getY() + 10.0 * CONTROL_MULTIPLIER);
+          camera.getXform2().adjustTy(10.0 * CONTROL_MULTIPLIER);
         }
         else if (event.isAltDown() && event.isShiftDown()) {
-          camera.getCameraXform().rx.setAngle(camera.getCameraXform().rx.getAngle() + 10.0 * ALT_MULTIPLIER);
+          camera.getXform1().rx.setAngle(camera.getXform1().rx.getAngle() + 10.0 * ALT_MULTIPLIER);
         }
         else if (event.isControlDown()) {
-          camera.getCameraXform2().t.setY(camera.getCameraXform2().t.getY() + 1.0 * CONTROL_MULTIPLIER);
+          camera.getXform2().adjustTy(1.0 * CONTROL_MULTIPLIER);
         }
         else if (event.isAltDown()) {
-          camera.getCameraXform().rx.setAngle(camera.getCameraXform().rx.getAngle() + 2.0 * ALT_MULTIPLIER);
+          camera.getXform1().rx.setAngle(camera.getXform1().rx.getAngle() + 2.0 * ALT_MULTIPLIER);
         }
         else if (event.isShiftDown()) {
           double z = camera.getPerspectiveCamera().getTranslateZ();
@@ -282,30 +276,30 @@ private void handleKeyboard(Scene scene, final Node root, Camera camera) {
         break;
       case RIGHT:
         if (event.isControlDown() && event.isShiftDown()) {
-          camera.getCameraXform2().t.setX(camera.getCameraXform2().t.getX() + 10.0 * CONTROL_MULTIPLIER);
+          camera.getXform2().adjustTx(10.0 * CONTROL_MULTIPLIER);
         }
         else if (event.isAltDown() && event.isShiftDown()) {
-          camera.getCameraXform().ry.setAngle(camera.getCameraXform().ry.getAngle() - 10.0 * ALT_MULTIPLIER);
+          camera.getXform1().ry.setAngle(camera.getXform1().ry.getAngle() - 10.0 * ALT_MULTIPLIER);
         }
         else if (event.isControlDown()) {
-          camera.getCameraXform2().t.setX(camera.getCameraXform2().t.getX() + 1.0 * CONTROL_MULTIPLIER);
+          camera.getXform2().adjustTx(1.0 * CONTROL_MULTIPLIER);
         }
         else if (event.isAltDown()) {
-          camera.getCameraXform().ry.setAngle(camera.getCameraXform().ry.getAngle() - 2.0 * ALT_MULTIPLIER);
+          camera.getXform1().ry.setAngle(camera.getXform1().ry.getAngle() - 2.0 * ALT_MULTIPLIER);
         }
         break;
       case LEFT:
         if (event.isControlDown() && event.isShiftDown()) {
-          camera.getCameraXform2().t.setX(camera.getCameraXform2().t.getX() - 10.0 * CONTROL_MULTIPLIER);
+          camera.getXform2().adjustTx(-10.0 * CONTROL_MULTIPLIER);
         }
         else if (event.isAltDown() && event.isShiftDown()) {
-          camera.getCameraXform().ry.setAngle(camera.getCameraXform().ry.getAngle() + 10.0 * ALT_MULTIPLIER);  // -
+          camera.getXform1().ry.setAngle(camera.getXform1().ry.getAngle() + 10.0 * ALT_MULTIPLIER);  // -
         }
         else if (event.isControlDown()) {
-          camera.getCameraXform2().t.setX(camera.getCameraXform2().t.getX() - 1.0 * CONTROL_MULTIPLIER);
+          camera.getXform2().adjustTx(-1.0 * CONTROL_MULTIPLIER);
         }
         else if (event.isAltDown()) {
-          camera.getCameraXform().ry.setAngle(camera.getCameraXform().ry.getAngle() + 2.0 * ALT_MULTIPLIER);  // -
+          camera.getXform1().ry.setAngle(camera.getXform1().ry.getAngle() + 2.0 * ALT_MULTIPLIER);  // -
         }
         break;
     }
