@@ -29,6 +29,9 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
+/* Modifications licensed under the Eclipse Public License */
+
 package com.flowlikeariver.javafx.threed;
 
 import javafx.scene.Group;

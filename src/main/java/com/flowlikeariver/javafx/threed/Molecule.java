@@ -29,6 +29,8 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
+/* Modifications licensed under the Eclipse Public License */
 package com.flowlikeariver.javafx.threed;
 
 import javafx.application.Application;
@@ -42,7 +44,6 @@ import javafx.scene.shape.Box;
 import javafx.scene.shape.Cylinder;
 import javafx.scene.shape.Sphere;
 import javafx.scene.transform.Rotate;
-import javafx.animation.Timeline;
 import javafx.scene.Node;
 
 /**
@@ -50,20 +51,10 @@ import javafx.scene.Node;
  */
 public class Molecule extends Application {
 
-final Group root = new Group();
-final Group axisGroup = new Group();
-final Xform world = new Xform();
-final Xform moleculeGroup = new Xform();
-private Timeline timeline;
-boolean timelinePlaying = false;
 double mousePosX;
 double mousePosY;
 
-private void buildScene() {
-  root.getChildren().add(world);
-}
-
-private void buildAxes() {
+private Group buildAxes() {
   final PhongMaterial redMaterial = new PhongMaterial();
   redMaterial.setDiffuseColor(Color.DARKRED);
   redMaterial.setSpecularColor(Color.RED);
@@ -84,8 +75,9 @@ private void buildAxes() {
   yAxis.setMaterial(greenMaterial);
   zAxis.setMaterial(blueMaterial);
 
+  Group axisGroup = new Group();
   axisGroup.getChildren().addAll(xAxis, yAxis, zAxis);
-  world.add(axisGroup);
+  return axisGroup;
 }
 
 // Molecule Hierarchy
@@ -100,7 +92,7 @@ private void buildAxes() {
 //         [*] hydrogen2Xform
 //             [*] hydrogen2Sphere
 //         [*] bond2Cylinder
-private void buildMolecule() {
+private Xform buildMolecule() {
   final PhongMaterial redMaterial = new PhongMaterial();
   redMaterial.setDiffuseColor(Color.DARKRED);
   redMaterial.setSpecularColor(Color.RED);
@@ -154,8 +146,9 @@ private void buildMolecule() {
 
   Xform moleculeXform = new Xform();
   moleculeXform.add(oxygenXform).add(hydrogen1SideXform).add(hydrogen2SideXform);
+  Xform moleculeGroup = new Xform();
   moleculeGroup.add(moleculeXform);
-  world.add(moleculeGroup);
+  return moleculeGroup;
 }
 
 private void handleMouse(Scene scene, final Node root, Camera camera) {
@@ -196,27 +189,18 @@ private void handleMouse(Scene scene, final Node root, Camera camera) {
   });
 }
 
-private void handleKeyboard(Scene scene, Camera camera) {
+private void handleKeyboard(Scene scene, Camera camera, Group axes, Group molecule) {
   scene.setOnKeyPressed(event -> {
     switch (event.getCode()) {
       case X:
         if (event.isControlDown()) {
-          axisGroup.setVisible(!axisGroup.isVisible());
+          axes.setVisible(!axes.isVisible());
         }
         break;
       case S:
         if (event.isControlDown()) {
-          moleculeGroup.setVisible(!moleculeGroup.isVisible());
+          molecule.setVisible(!molecule.isVisible());
         }
-        break;
-      case SPACE:
-        if (timelinePlaying) {
-          timeline.pause();
-        }
-        else {
-          timeline.play();
-        }
-        timelinePlaying = !timelinePlaying;
         break;
       default:
         camera.handleKeyboard(event);
@@ -227,14 +211,18 @@ private void handleKeyboard(Scene scene, Camera camera) {
 
 @Override
 public void start(Stage primaryStage) {
-  buildScene();
+  Group root = new Group();
+  Xform world = new Xform();
   Camera camera = new Camera(root);
-  buildAxes();
-  buildMolecule();
+  Group axes = buildAxes();
+  world.add(axes);
+  Xform molecule = buildMolecule();
+  world.add(molecule);
+  root.getChildren().add(world);
 
   Scene scene = new Scene(root, 1024, 768, true);
   scene.setFill(Color.GREY);
-  handleKeyboard(scene, camera);
+  handleKeyboard(scene, camera, axes, molecule);
   handleMouse(scene, world, camera);
 
   primaryStage.setTitle("Molecule Sample Application");
