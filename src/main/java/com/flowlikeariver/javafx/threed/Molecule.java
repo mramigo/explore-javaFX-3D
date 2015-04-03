@@ -124,9 +124,7 @@ private Xform buildMolecule() {
   Xform hydrogen2SideXform = new Xform(createH(whiteMaterial), createBond(greyMaterial));
   hydrogen2SideXform.setRotateY(104.5);
 
-  Xform moleculeXform = new Xform(new Xform(oxygenSphere), hydrogen1SideXform, hydrogen2SideXform);
-
-  return new Xform(moleculeXform);
+  return new Xform(new Xform(oxygenSphere), hydrogen1SideXform, hydrogen2SideXform);
 }
 
 private void handleKeyboard(Scene scene, Camera camera, Group axes, Group molecule) {

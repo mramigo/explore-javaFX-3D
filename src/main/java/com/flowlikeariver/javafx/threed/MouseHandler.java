@@ -4,7 +4,7 @@ import javafx.scene.input.MouseEvent;
 
 public class MouseHandler {
 
-static final double MODIFIER_FACTOR = 0.1;
+public static final double MODIFIER_FACTOR = 0.1;
 
 private double mousePosX;
 private double mousePosY;

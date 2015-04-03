@@ -1,10 +1,9 @@
-
 package com.flowlikeariver.javafx.threed;
 
 import javafx.scene.input.KeyEvent;
 
-
 public class KeyboardHandler {
+
 public static final double CONTROL_MULTIPLIER = 0.1;
 public static final double SHIFT_MULTIPLIER = 0.1;
 public static final double ALT_MULTIPLIER = 0.5;
