@@ -30,7 +30,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package moleculesampleapp;
+package com.flowlikeariver.javafx.threed;
 
 import javafx.application.Application;
 import static javafx.application.Application.launch;
