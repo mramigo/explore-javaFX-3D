@@ -51,6 +51,8 @@ import javafx.scene.Node;
  */
 public class Molecule extends Application {
 
+static final double MODIFIER_FACTOR = 0.1;
+
 double mousePosX;
 double mousePosY;
 
@@ -78,6 +80,25 @@ private Group buildAxes() {
   Group axisGroup = new Group();
   axisGroup.getChildren().addAll(xAxis, yAxis, zAxis);
   return axisGroup;
+}
+
+private Xform createH(PhongMaterial sphereMaterial) {
+  Sphere sphere = new Sphere(30.0);
+  sphere.setMaterial(sphereMaterial);
+  sphere.setTranslateX(0.0);
+  Xform h = new Xform();
+  h.add(sphere);
+  h.setTx(100.0);
+  return h;
+}
+
+private Cylinder createBond(PhongMaterial m) {
+  Cylinder c = new Cylinder(5, 100);
+  c.setMaterial(m);
+  c.setTranslateX(50.0);
+  c.setRotationAxis(Rotate.Z_AXIS);
+  c.setRotate(90.0);
+  return c;
 }
 
 // Molecule Hierarchy
@@ -108,40 +129,14 @@ private Xform buildMolecule() {
   Sphere oxygenSphere = new Sphere(40.0);
   oxygenSphere.setMaterial(redMaterial);
 
-  Sphere hydrogen1Sphere = new Sphere(30.0);
-  hydrogen1Sphere.setMaterial(whiteMaterial);
-  hydrogen1Sphere.setTranslateX(0.0);
-
-  Sphere hydrogen2Sphere = new Sphere(30.0);
-  hydrogen2Sphere.setMaterial(whiteMaterial);
-  hydrogen2Sphere.setTranslateZ(0.0);
-
-  Cylinder bond1Cylinder = new Cylinder(5, 100);
-  bond1Cylinder.setMaterial(greyMaterial);
-  bond1Cylinder.setTranslateX(50.0);
-  bond1Cylinder.setRotationAxis(Rotate.Z_AXIS);
-  bond1Cylinder.setRotate(90.0);
-
   Xform oxygenXform = new Xform();
   oxygenXform.add(oxygenSphere);
 
-  Xform hydrogen1Xform = new Xform();
-  hydrogen1Xform.add(hydrogen1Sphere);
-  hydrogen1Xform.setTx(100.0);
   Xform hydrogen1SideXform = new Xform();
-  hydrogen1SideXform.add(hydrogen1Xform).add(bond1Cylinder);
+  hydrogen1SideXform.add(createH(whiteMaterial)).add(createBond(greyMaterial));
 
-  Cylinder bond2Cylinder = new Cylinder(5, 100);
-  bond2Cylinder.setMaterial(greyMaterial);
-  bond2Cylinder.setTranslateX(50.0);
-  bond2Cylinder.setRotationAxis(Rotate.Z_AXIS);
-  bond2Cylinder.setRotate(90.0);
-
-  Xform hydrogen2Xform = new Xform();
-  hydrogen2Xform.add(hydrogen2Sphere);
-  hydrogen2Xform.setTx(100.0);
   Xform hydrogen2SideXform = new Xform();
-  hydrogen2SideXform.add(hydrogen2Xform).add(bond2Cylinder);
+  hydrogen2SideXform.add(createH(whiteMaterial)).add(createBond(greyMaterial));
   hydrogen2SideXform.setRotateY(104.5);
 
   Xform moleculeXform = new Xform();
@@ -161,30 +156,22 @@ private void handleMouse(Scene scene, final Node root, Camera camera) {
     double mouseOldY = mousePosY;
     mousePosX = me.getSceneX();
     mousePosY = me.getSceneY();
-    double mouseDeltaX = (mousePosX - mouseOldX);
-    double mouseDeltaY = (mousePosY - mouseOldY);
 
-    double modifier = 1.0;
-    double modifierFactor = 0.1;
-
-    if (me.isControlDown()) {
-      modifier = 0.1;
-    }
-    if (me.isShiftDown()) {
-      modifier = 10.0;
-    }
+    double modifier = me.isShiftDown() ? 10.0 : (me.isControlDown() ? 0.1 : 1.0);
+    double mouseDeltaX = (mousePosX - mouseOldX) * MODIFIER_FACTOR * modifier;
+    double mouseDeltaY = (mousePosY - mouseOldY) * MODIFIER_FACTOR * modifier;
     if (me.isPrimaryButtonDown()) {
       camera.getXform1()
-        .adjustRy(-mouseDeltaX * modifierFactor * modifier * 2.0)
-        .adjustRx(mouseDeltaY * modifierFactor * modifier * 2.0);
+        .adjustRy(-mouseDeltaX * 2.0)
+        .adjustRx(mouseDeltaY * 2.0);
     }
     else if (me.isSecondaryButtonDown()) {
-      camera.adjustCameraZ(mouseDeltaX * modifierFactor * modifier);
+      camera.adjustCameraZ(mouseDeltaX);
     }
     else if (me.isMiddleButtonDown()) {
       camera.getXform2()
-        .adjustTx(mouseDeltaX * modifierFactor * modifier * 0.3)
-        .adjustTy(mouseDeltaY * modifierFactor * modifier * 0.3);
+        .adjustTx(mouseDeltaX * 0.3)
+        .adjustTy(mouseDeltaY * 0.3);
     }
   });
 }
@@ -225,11 +212,11 @@ public void start(Stage primaryStage) {
   handleKeyboard(scene, camera, axes, molecule);
   handleMouse(scene, world, camera);
 
+  scene.setCamera(camera.getPerspectiveCamera());
+
   primaryStage.setTitle("Molecule Sample Application");
   primaryStage.setScene(scene);
   primaryStage.show();
-
-  scene.setCamera(camera.getPerspectiveCamera());
 }
 
 /**
