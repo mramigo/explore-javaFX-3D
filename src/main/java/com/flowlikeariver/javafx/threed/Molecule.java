@@ -31,9 +31,6 @@
  */
 package com.flowlikeariver.javafx.threed;
 
-import static com.flowlikeariver.javafx.threed.Camera.ALT_MULTIPLIER;
-import static com.flowlikeariver.javafx.threed.Camera.CONTROL_MULTIPLIER;
-import static com.flowlikeariver.javafx.threed.Camera.SHIFT_MULTIPLIER;
 import javafx.application.Application;
 import static javafx.application.Application.launch;
 import javafx.scene.Group;
@@ -51,7 +48,7 @@ import javafx.scene.Node;
 /**
  * MoleculeSampleApp
  */
-public class MoleculeSampleApp extends Application {
+public class Molecule extends Application {
 
 final Group root = new Group();
 final Group axisGroup = new Group();
@@ -61,8 +58,6 @@ private Timeline timeline;
 boolean timelinePlaying = false;
 double mousePosX;
 double mousePosY;
-double mouseOldX;
-double mouseOldY;
 double mouseDeltaX;
 double mouseDeltaY;
 
@@ -169,12 +164,10 @@ private void handleMouse(Scene scene, final Node root, Camera camera) {
   scene.setOnMousePressed(me -> {
     mousePosX = me.getSceneX();
     mousePosY = me.getSceneY();
-    mouseOldX = me.getSceneX();
-    mouseOldY = me.getSceneY();
   });
   scene.setOnMouseDragged(me -> {
-    mouseOldX = mousePosX;
-    mouseOldY = mousePosY;
+    double mouseOldX = mousePosX;
+    double mouseOldY = mousePosY;
     mousePosX = me.getSceneX();
     mousePosY = me.getSceneY();
     mouseDeltaX = (mousePosX - mouseOldX);
@@ -205,16 +198,9 @@ private void handleMouse(Scene scene, final Node root, Camera camera) {
   });
 }
 
-private void handleKeyboard(Scene scene, final Node root, Camera camera) {
+private void handleKeyboard(Scene scene, Camera camera) {
   scene.setOnKeyPressed(event -> {
     switch (event.getCode()) {
-      case Z:
-        if (event.isShiftDown()) {
-          camera.getXform1().setRy(0.0).setRx(0.0);
-          camera.getPerspectiveCamera().setTranslateZ(-300.0);
-        }
-        camera.getXform2().setTx(0.0).setTy(0.0);
-        break;
       case X:
         if (event.isControlDown()) {
           axisGroup.setVisible(!axisGroup.isVisible());
@@ -234,67 +220,8 @@ private void handleKeyboard(Scene scene, final Node root, Camera camera) {
         }
         timelinePlaying = !timelinePlaying;
         break;
-      case UP:
-        if (event.isControlDown() && event.isShiftDown()) {
-          camera.getXform2().adjustTy(-10.0 * CONTROL_MULTIPLIER);
-        }
-        else if (event.isAltDown() && event.isShiftDown()) {
-          camera.getXform1().adjustRx(-10.0 * ALT_MULTIPLIER);
-        }
-        else if (event.isControlDown()) {
-          camera.getXform2().adjustTy(-1.0 * CONTROL_MULTIPLIER);
-        }
-        else if (event.isAltDown()) {
-          camera.getXform1().adjustRx(-2.0 * ALT_MULTIPLIER);
-        }
-        else if (event.isShiftDown()) {
-          camera.adjustCameraZ(5.0 * SHIFT_MULTIPLIER);
-        }
-        break;
-      case DOWN:
-        if (event.isControlDown() && event.isShiftDown()) {
-          camera.getXform2().adjustTy(10.0 * CONTROL_MULTIPLIER);
-        }
-        else if (event.isAltDown() && event.isShiftDown()) {
-          camera.getXform1().adjustRx(10.0 * ALT_MULTIPLIER);
-        }
-        else if (event.isControlDown()) {
-          camera.getXform2().adjustTy(1.0 * CONTROL_MULTIPLIER);
-        }
-        else if (event.isAltDown()) {
-          camera.getXform1().adjustRx(2.0 * ALT_MULTIPLIER);
-        }
-        else if (event.isShiftDown()) {
-          camera.adjustCameraZ(-5.0 * SHIFT_MULTIPLIER);
-        }
-        break;
-      case RIGHT:
-        if (event.isControlDown() && event.isShiftDown()) {
-          camera.getXform2().adjustTx(10.0 * CONTROL_MULTIPLIER);
-        }
-        else if (event.isAltDown() && event.isShiftDown()) {
-          camera.getXform1().adjustRy(-10.0 * ALT_MULTIPLIER);
-        }
-        else if (event.isControlDown()) {
-          camera.getXform2().adjustTx(1.0 * CONTROL_MULTIPLIER);
-        }
-        else if (event.isAltDown()) {
-          camera.getXform1().adjustRy(-2.0 * ALT_MULTIPLIER);
-        }
-        break;
-      case LEFT:
-        if (event.isControlDown() && event.isShiftDown()) {
-          camera.getXform2().adjustTx(-10.0 * CONTROL_MULTIPLIER);
-        }
-        else if (event.isAltDown() && event.isShiftDown()) {
-          camera.getXform1().adjustRy(10.0 * ALT_MULTIPLIER);  // -
-        }
-        else if (event.isControlDown()) {
-          camera.getXform2().adjustTx(-1.0 * CONTROL_MULTIPLIER);
-        }
-        else if (event.isAltDown()) {
-          camera.getXform1().adjustRy(2.0 * ALT_MULTIPLIER);  // -
-        }
+      default:
+        camera.handleKeyboard(event);
         break;
     }
   });
@@ -309,7 +236,7 @@ public void start(Stage primaryStage) {
 
   Scene scene = new Scene(root, 1024, 768, true);
   scene.setFill(Color.GREY);
-  handleKeyboard(scene, world, camera);
+  handleKeyboard(scene, camera);
   handleMouse(scene, world, camera);
 
   primaryStage.setTitle("Molecule Sample Application");
