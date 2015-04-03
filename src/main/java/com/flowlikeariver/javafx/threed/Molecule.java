@@ -152,7 +152,8 @@ public void start(Stage primaryStage) {
 
   Scene scene = new Scene(root, 1024, 768, true);
   scene.setFill(Color.IVORY);
-  Camera camera = new Camera(root);
+  Camera camera = new Camera();
+  root.getChildren().add(camera.getXform1());
   handleKeyboard(scene, camera, axes, molecule);
   MouseHandler mh = new MouseHandler(camera);
   scene.setOnMousePressed(mh::recordMove);
