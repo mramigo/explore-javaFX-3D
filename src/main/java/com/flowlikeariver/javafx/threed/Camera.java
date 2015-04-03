@@ -2,31 +2,15 @@ package com.flowlikeariver.javafx.threed;
 
 import javafx.scene.Group;
 import javafx.scene.PerspectiveCamera;
-import static javafx.scene.input.KeyCode.DOWN;
-import static javafx.scene.input.KeyCode.LEFT;
-import static javafx.scene.input.KeyCode.RIGHT;
-import static javafx.scene.input.KeyCode.UP;
-import static javafx.scene.input.KeyCode.Z;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
 
 public class Camera {
-
-static final double MODIFIER_FACTOR = 0.1;
-
 public static final double DELTA_MULTIPLIER = 200.0;
-public static final double CONTROL_MULTIPLIER = 0.1;
-public static final double SHIFT_MULTIPLIER = 0.1;
-public static final double ALT_MULTIPLIER = 0.5;
 
 private final PerspectiveCamera pc = new PerspectiveCamera(true);
 private final Xform xForm1 = new Xform();
 private final Xform xForm2 = new Xform();
 private final Xform xform3 = new Xform();
 private final double cameraDistance = 450;
-
-private double mousePosX;
-private double mousePosY;
 
 public Camera(Group root) {
   xform3.add(pc);
@@ -65,110 +49,6 @@ public Xform getXform2() {
 
 public void adjustCameraZ(double delta) {
   pc.setTranslateZ(pc.getTranslateZ() + delta);
-}
-
-public void handleKeyboard(KeyEvent event) {
-  System.out.println(event.getCode());
-  switch (event.getCode()) {
-    case Z:
-      if (event.isShiftDown()) {
-        xForm1.setRy(0.0).setRx(0.0);
-        pc.setTranslateZ(-300.0);
-      }
-      xForm2.setTx(0.0).setTy(0.0);
-      break;
-    case UP:
-      if (event.isControlDown() && event.isShiftDown()) {
-        xForm2.adjustTy(-10.0 * CONTROL_MULTIPLIER);
-      }
-      else if (event.isAltDown() && event.isShiftDown()) {
-        xForm1.adjustRx(-10.0 * ALT_MULTIPLIER);
-      }
-      else if (event.isControlDown()) {
-        xForm2.adjustTy(-1.0 * CONTROL_MULTIPLIER);
-      }
-      else if (event.isAltDown()) {
-        xForm1.adjustRx(-2.0 * ALT_MULTIPLIER);
-      }
-      else if (event.isShiftDown()) {
-        adjustCameraZ(5.0 * SHIFT_MULTIPLIER);
-      }
-      break;
-    case DOWN:
-      if (event.isControlDown() && event.isShiftDown()) {
-        xForm2.adjustTy(10.0 * CONTROL_MULTIPLIER);
-      }
-      else if (event.isAltDown() && event.isShiftDown()) {
-        xForm1.adjustRx(10.0 * ALT_MULTIPLIER);
-      }
-      else if (event.isControlDown()) {
-        xForm2.adjustTy(1.0 * CONTROL_MULTIPLIER);
-      }
-      else if (event.isAltDown()) {
-        xForm1.adjustRx(2.0 * ALT_MULTIPLIER);
-      }
-      else if (event.isShiftDown()) {
-        adjustCameraZ(-5.0 * SHIFT_MULTIPLIER);
-      }
-      break;
-    case RIGHT:
-      if (event.isControlDown() && event.isShiftDown()) {
-        xForm2.adjustTx(10.0 * CONTROL_MULTIPLIER);
-      }
-      else if (event.isAltDown() && event.isShiftDown()) {
-        xForm1.adjustRy(-10.0 * ALT_MULTIPLIER);
-      }
-      else if (event.isControlDown()) {
-        xForm2.adjustTx(1.0 * CONTROL_MULTIPLIER);
-      }
-      else if (event.isAltDown()) {
-        xForm1.adjustRy(-2.0 * ALT_MULTIPLIER);
-      }
-      break;
-    case LEFT:
-      if (event.isControlDown() && event.isShiftDown()) {
-        xForm2.adjustTx(-10.0 * CONTROL_MULTIPLIER);
-      }
-      else if (event.isAltDown() && event.isShiftDown()) {
-        xForm1.adjustRy(10.0 * ALT_MULTIPLIER);  // -
-      }
-      else if (event.isControlDown()) {
-        xForm2.adjustTx(-1.0 * CONTROL_MULTIPLIER);
-      }
-      else if (event.isAltDown()) {
-        xForm1.adjustRy(2.0 * ALT_MULTIPLIER);  // -
-      }
-      break;
-  }
-}
-
-public void recordMove(MouseEvent me) {
-  mousePosX = me.getSceneX();
-  mousePosY = me.getSceneY();
-}
-
-public void handleMouse(MouseEvent me) {
-  double mouseOldX = mousePosX;
-  double mouseOldY = mousePosY;
-  mousePosX = me.getSceneX();
-  mousePosY = me.getSceneY();
-
-  double modifier = me.isShiftDown() ? 10.0 : (me.isControlDown() ? 0.1 : 1.0);
-  double mouseDeltaX = (mousePosX - mouseOldX) * MODIFIER_FACTOR * modifier;
-  double mouseDeltaY = (mousePosY - mouseOldY) * MODIFIER_FACTOR * modifier;
-  if (me.isPrimaryButtonDown()) {
-    xForm1
-      .adjustRy(-mouseDeltaX * 2.0)
-      .adjustRx(mouseDeltaY * 2.0);
-  }
-  else if (me.isSecondaryButtonDown()) {
-    adjustCameraZ(mouseDeltaX);
-  }
-  else if (me.isMiddleButtonDown()) {
-    xForm2
-      .adjustTx(mouseDeltaX * 0.3)
-      .adjustTy(mouseDeltaY * 0.3);
-  }
 }
 
 }

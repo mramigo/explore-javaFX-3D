@@ -31,7 +31,6 @@
  */
 
 /* Modifications licensed under the Eclipse Public License */
-
 package com.flowlikeariver.javafx.threed;
 
 import javafx.scene.Group;
@@ -89,7 +88,12 @@ public Xform(RotateOrder rotateOrder) {
   }
 }
 
-private void init() { 
+public Xform(Node... nodes) {
+  this();
+  getChildren().addAll(nodes);
+}
+
+private void init() {
   rx.setAxis(Rotate.X_AXIS);
   rz.setAxis(Rotate.Z_AXIS);
   ry.setAxis(Rotate.Y_AXIS);

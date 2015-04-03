@@ -37,38 +37,44 @@ import javafx.application.Application;
 import static javafx.application.Application.launch;
 import javafx.scene.Group;
 import javafx.scene.Scene;
+import static javafx.scene.input.KeyCode.S;
+import static javafx.scene.input.KeyCode.X;
 import javafx.scene.paint.Color;
-import javafx.stage.Stage;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Box;
 import javafx.scene.shape.Cylinder;
 import javafx.scene.shape.Sphere;
 import javafx.scene.transform.Rotate;
+import javafx.stage.Stage;
 
 /**
  * MoleculeSampleApp
  */
 public class Molecule extends Application {
 
-double mousePosX;
-double mousePosY;
+static final PhongMaterial redMaterial = new PhongMaterial();
+static final PhongMaterial greenMaterial = new PhongMaterial();
+static final PhongMaterial blueMaterial = new PhongMaterial();
+static final PhongMaterial whiteMaterial = new PhongMaterial();
+static final PhongMaterial greyMaterial = new PhongMaterial();
 
-private Group buildAxes() {
-  final PhongMaterial redMaterial = new PhongMaterial();
+{
   redMaterial.setDiffuseColor(Color.DARKRED);
   redMaterial.setSpecularColor(Color.RED);
-
-  final PhongMaterial greenMaterial = new PhongMaterial();
   greenMaterial.setDiffuseColor(Color.DARKGREEN);
   greenMaterial.setSpecularColor(Color.GREEN);
-
-  final PhongMaterial blueMaterial = new PhongMaterial();
   blueMaterial.setDiffuseColor(Color.DARKBLUE);
   blueMaterial.setSpecularColor(Color.BLUE);
+  greyMaterial.setDiffuseColor(Color.DARKGREY);
+  greyMaterial.setSpecularColor(Color.GREY);
+  whiteMaterial.setDiffuseColor(Color.WHITE);
+  whiteMaterial.setSpecularColor(Color.LIGHTBLUE);
+}
 
-  final Box xAxis = new Box(240.0, 1, 1);
-  final Box yAxis = new Box(1, 240.0, 1);
-  final Box zAxis = new Box(1, 1, 240.0);
+private Group buildAxes() {
+  Box xAxis = new Box(240.0, 1, 1);
+  Box yAxis = new Box(1, 240.0, 1);
+  Box zAxis = new Box(1, 1, 240.0);
 
   xAxis.setMaterial(redMaterial);
   yAxis.setMaterial(greenMaterial);
@@ -83,8 +89,7 @@ private Xform createH(PhongMaterial sphereMaterial) {
   Sphere sphere = new Sphere(30.0);
   sphere.setMaterial(sphereMaterial);
   sphere.setTranslateX(0.0);
-  Xform h = new Xform();
-  h.add(sphere);
+  Xform h = new Xform(sphere);
   h.setTx(100.0);
   return h;
 }
@@ -111,78 +116,52 @@ private Cylinder createBond(PhongMaterial m) {
 //             [*] hydrogen2Sphere
 //         [*] bond2Cylinder
 private Xform buildMolecule() {
-  final PhongMaterial redMaterial = new PhongMaterial();
-  redMaterial.setDiffuseColor(Color.DARKRED);
-  redMaterial.setSpecularColor(Color.RED);
-
-  final PhongMaterial whiteMaterial = new PhongMaterial();
-  whiteMaterial.setDiffuseColor(Color.WHITE);
-  whiteMaterial.setSpecularColor(Color.LIGHTBLUE);
-
-  final PhongMaterial greyMaterial = new PhongMaterial();
-  greyMaterial.setDiffuseColor(Color.DARKGREY);
-  greyMaterial.setSpecularColor(Color.GREY);
-
   Sphere oxygenSphere = new Sphere(40.0);
   oxygenSphere.setMaterial(redMaterial);
 
-  Xform oxygenXform = new Xform();
-  oxygenXform.add(oxygenSphere);
+  Xform hydrogen1SideXform = new Xform(createH(whiteMaterial), createBond(greyMaterial));
 
-  Xform hydrogen1SideXform = new Xform();
-  hydrogen1SideXform.add(createH(whiteMaterial)).add(createBond(greyMaterial));
-
-  Xform hydrogen2SideXform = new Xform();
-  hydrogen2SideXform.add(createH(whiteMaterial)).add(createBond(greyMaterial));
+  Xform hydrogen2SideXform = new Xform(createH(whiteMaterial), createBond(greyMaterial));
   hydrogen2SideXform.setRotateY(104.5);
 
-  Xform moleculeXform = new Xform();
-  moleculeXform.add(oxygenXform).add(hydrogen1SideXform).add(hydrogen2SideXform);
-  Xform moleculeGroup = new Xform();
-  moleculeGroup.add(moleculeXform);
-  return moleculeGroup;
+  Xform moleculeXform = new Xform(new Xform(oxygenSphere), hydrogen1SideXform, hydrogen2SideXform);
+
+  return new Xform(moleculeXform);
 }
 
 private void handleKeyboard(Scene scene, Camera camera, Group axes, Group molecule) {
+  KeyboardHandler kh = new KeyboardHandler(camera);
   scene.setOnKeyPressed(event -> {
-    switch (event.getCode()) {
-      case X:
-        if (event.isControlDown()) {
-          axes.setVisible(!axes.isVisible());
-        }
-        break;
-      case S:
-        if (event.isControlDown()) {
-          molecule.setVisible(!molecule.isVisible());
-        }
-        break;
-      default:
-        camera.handleKeyboard(event);
-        break;
+    if ((X == event.getCode()) && event.isControlDown()) {
+      axes.setVisible(!axes.isVisible());
+    }
+    else if ((S == event.getCode()) && event.isControlDown()) {
+      molecule.setVisible(!molecule.isVisible());
+    }
+    else {
+      kh.handleKeyboard(event);
     }
   });
 }
 
 @Override
 public void start(Stage primaryStage) {
-  Group root = new Group();
-  Xform world = new Xform();
-  Camera camera = new Camera(root);
   Group axes = buildAxes();
-  world.add(axes);
   Xform molecule = buildMolecule();
-  world.add(molecule);
+  Xform world = new Xform(axes, molecule);
+  Group root = new Group();
   root.getChildren().add(world);
 
   Scene scene = new Scene(root, 1024, 768, true);
   scene.setFill(Color.IVORY);
+  Camera camera = new Camera(root);
   handleKeyboard(scene, camera, axes, molecule);
-  scene.setOnMousePressed(camera::recordMove);
-  scene.setOnMouseDragged(camera::handleMouse);
-
+  MouseHandler mh = new MouseHandler(camera);
+  scene.setOnMousePressed(mh::recordMove);
+  scene.setOnMouseDragged(mh::handleMouse);
   scene.setCamera(camera.getPerspectiveCamera());
 
-  primaryStage.setTitle("Molecule Sample Application");
+  primaryStage.setTitle("Molecule");
   primaryStage.setScene(scene);
   primaryStage.show();
 }
