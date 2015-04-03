@@ -8,8 +8,11 @@ import static javafx.scene.input.KeyCode.RIGHT;
 import static javafx.scene.input.KeyCode.UP;
 import static javafx.scene.input.KeyCode.Z;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 
 public class Camera {
+
+static final double MODIFIER_FACTOR = 0.1;
 
 public static final double DELTA_MULTIPLIER = 200.0;
 public static final double CONTROL_MULTIPLIER = 0.1;
@@ -21,6 +24,9 @@ private final Xform xForm1 = new Xform();
 private final Xform xForm2 = new Xform();
 private final Xform xform3 = new Xform();
 private final double cameraDistance = 450;
+
+private double mousePosX;
+private double mousePosY;
 
 public Camera(Group root) {
   xform3.add(pc);
@@ -133,6 +139,35 @@ public void handleKeyboard(KeyEvent event) {
         xForm1.adjustRy(2.0 * ALT_MULTIPLIER);  // -
       }
       break;
+  }
+}
+
+public void recordMove(MouseEvent me) {
+  mousePosX = me.getSceneX();
+  mousePosY = me.getSceneY();
+}
+
+public void handleMouse(MouseEvent me) {
+  double mouseOldX = mousePosX;
+  double mouseOldY = mousePosY;
+  mousePosX = me.getSceneX();
+  mousePosY = me.getSceneY();
+
+  double modifier = me.isShiftDown() ? 10.0 : (me.isControlDown() ? 0.1 : 1.0);
+  double mouseDeltaX = (mousePosX - mouseOldX) * MODIFIER_FACTOR * modifier;
+  double mouseDeltaY = (mousePosY - mouseOldY) * MODIFIER_FACTOR * modifier;
+  if (me.isPrimaryButtonDown()) {
+    xForm1
+      .adjustRy(-mouseDeltaX * 2.0)
+      .adjustRx(mouseDeltaY * 2.0);
+  }
+  else if (me.isSecondaryButtonDown()) {
+    adjustCameraZ(mouseDeltaX);
+  }
+  else if (me.isMiddleButtonDown()) {
+    xForm2
+      .adjustTx(mouseDeltaX * 0.3)
+      .adjustTy(mouseDeltaY * 0.3);
   }
 }
 

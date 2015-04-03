@@ -44,14 +44,11 @@ import javafx.scene.shape.Box;
 import javafx.scene.shape.Cylinder;
 import javafx.scene.shape.Sphere;
 import javafx.scene.transform.Rotate;
-import javafx.scene.Node;
 
 /**
  * MoleculeSampleApp
  */
 public class Molecule extends Application {
-
-static final double MODIFIER_FACTOR = 0.1;
 
 double mousePosX;
 double mousePosY;
@@ -146,36 +143,6 @@ private Xform buildMolecule() {
   return moleculeGroup;
 }
 
-private void handleMouse(Scene scene, final Node root, Camera camera) {
-  scene.setOnMousePressed(me -> {
-    mousePosX = me.getSceneX();
-    mousePosY = me.getSceneY();
-  });
-  scene.setOnMouseDragged(me -> {
-    double mouseOldX = mousePosX;
-    double mouseOldY = mousePosY;
-    mousePosX = me.getSceneX();
-    mousePosY = me.getSceneY();
-
-    double modifier = me.isShiftDown() ? 10.0 : (me.isControlDown() ? 0.1 : 1.0);
-    double mouseDeltaX = (mousePosX - mouseOldX) * MODIFIER_FACTOR * modifier;
-    double mouseDeltaY = (mousePosY - mouseOldY) * MODIFIER_FACTOR * modifier;
-    if (me.isPrimaryButtonDown()) {
-      camera.getXform1()
-        .adjustRy(-mouseDeltaX * 2.0)
-        .adjustRx(mouseDeltaY * 2.0);
-    }
-    else if (me.isSecondaryButtonDown()) {
-      camera.adjustCameraZ(mouseDeltaX);
-    }
-    else if (me.isMiddleButtonDown()) {
-      camera.getXform2()
-        .adjustTx(mouseDeltaX * 0.3)
-        .adjustTy(mouseDeltaY * 0.3);
-    }
-  });
-}
-
 private void handleKeyboard(Scene scene, Camera camera, Group axes, Group molecule) {
   scene.setOnKeyPressed(event -> {
     switch (event.getCode()) {
@@ -208,9 +175,10 @@ public void start(Stage primaryStage) {
   root.getChildren().add(world);
 
   Scene scene = new Scene(root, 1024, 768, true);
-  scene.setFill(Color.GREY);
+  scene.setFill(Color.IVORY);
   handleKeyboard(scene, camera, axes, molecule);
-  handleMouse(scene, world, camera);
+  scene.setOnMousePressed(camera::recordMove);
+  scene.setOnMouseDragged(camera::handleMouse);
 
   scene.setCamera(camera.getPerspectiveCamera());
 
