@@ -65,15 +65,10 @@ private void handleKeyboard(Scene scene, Camera camera, Group axes, Group molecu
 @Override
 public void start(Stage primaryStage) {
   Group axes = MoleculeFactory.buildAxes();
-  Xform molecule = MoleculeFactory.buildMolecule();
-  Xform world = new Xform(axes, molecule);
-  Group root = new Group();
-  root.getChildren().add(world);
-
-  Scene scene = new Scene(root, 1024, 768, true);
+  Group molecule = MoleculeFactory.buildMolecule();
+  Scene scene = new Scene(new Group(axes, molecule), 1024, 768, true);
   scene.setFill(Color.IVORY);
   Camera camera = new Camera();
-  root.getChildren().add(camera.getXform1());
   handleKeyboard(scene, camera, axes, molecule);
   MouseHandler mh = new MouseHandler(camera);
   scene.setOnMousePressed(mh::recordMove);
