@@ -1,5 +1,4 @@
 /* Original code from Pro JavxFX 8 published by Apress */
-
 package com.flowlikeariver.javafx.book;
 
 import javafx.application.Application;
@@ -8,6 +7,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.ComboBox;
@@ -63,12 +63,9 @@ public static void main(String[] args) {
 
 private static class Model {
 
-private ObjectProperty<Material> material = new SimpleObjectProperty<>(
-  this, "material", new PhongMaterial(Color.BLUE));
-private ObjectProperty<DrawMode> drawMode = new SimpleObjectProperty<>(
-  this, "drawMode", DrawMode.FILL);
-private ObjectProperty<CullFace> cullFace = new SimpleObjectProperty<>(
-  this, "cullFace", CullFace.BACK);
+private final ObjectProperty<Material> material = new SimpleObjectProperty<>(this, "material", new PhongMaterial(Color.BLUE));
+private final ObjectProperty<DrawMode> drawMode = new SimpleObjectProperty<>(this, "drawMode", DrawMode.FILL);
+private final ObjectProperty<CullFace> cullFace = new SimpleObjectProperty<>(this, "cullFace", CullFace.BACK);
 
 public final Material getMaterial() {
   return material.get();
@@ -109,6 +106,8 @@ public final ObjectProperty<CullFace> cullFaceProperty() {
 
 private static class View {
 
+public static final Node EMPTY_BORDER = null;
+
 public Scene scene;
 public Sphere sphere;
 public ColorPicker colorPicker;
@@ -124,21 +123,20 @@ public View(Model model) {
   colorPicker = new ColorPicker(Color.BLUE);
 
   drawModeComboBox = new ComboBox<>();
-  drawModeComboBox.setItems(FXCollections.observableArrayList(
-    DrawMode.FILL, DrawMode.LINE));
+  drawModeComboBox.setItems(FXCollections.observableArrayList(DrawMode.FILL, DrawMode.LINE));
   drawModeComboBox.setValue(DrawMode.FILL);
 
   cullFaceComboBox = new ComboBox<>();
-  cullFaceComboBox.setItems(FXCollections.observableArrayList(
-    CullFace.BACK, CullFace.FRONT, CullFace.NONE));
+  cullFaceComboBox.setItems(FXCollections.observableArrayList(CullFace.BACK, CullFace.FRONT, CullFace.NONE));
   cullFaceComboBox.setValue(CullFace.BACK);
 
-  HBox hbox = new HBox(10, new Label("Color:"), colorPicker,
+  HBox hbox = new HBox(10, 
+    new Label("Color:"), colorPicker,
     new Label("DrawMode:"), drawModeComboBox,
     new Label("CullFace:"), cullFaceComboBox);
   hbox.setPadding(new Insets(10, 10, 10, 10));
   hbox.setAlignment(Pos.CENTER);
-  BorderPane root = new BorderPane(sphere, null, null, hbox, null);
+  BorderPane root = new BorderPane(sphere, EMPTY_BORDER, EMPTY_BORDER, hbox, EMPTY_BORDER);
   scene = new Scene(root, 640, 480);
 }
 }

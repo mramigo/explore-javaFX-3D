@@ -30,7 +30,7 @@ public void handleMouse(MouseEvent me) {
   double mouseDeltaX = (mousePosX - mouseOldX) * MODIFIER_FACTOR * modifier;
   double mouseDeltaY = (mousePosY - mouseOldY) * MODIFIER_FACTOR * modifier;
   if (me.isPrimaryButtonDown()) {
-    camera.getXform1()
+    camera
       .adjustRy(-mouseDeltaX * 2.0)
       .adjustRx(mouseDeltaY * 2.0);
   }
@@ -38,7 +38,7 @@ public void handleMouse(MouseEvent me) {
     camera.adjustCameraZ(mouseDeltaX);
   }
   else if (me.isMiddleButtonDown()) {
-    camera.getXform2()
+    camera
       .adjustTx(mouseDeltaX * 0.3)
       .adjustTy(mouseDeltaY * 0.3);
   }

@@ -45,4 +45,36 @@ public void adjustCameraZ(double delta) {
   pc.setTranslateZ(pc.getTranslateZ() + delta);
 }
 
+public Xform adjustTx(double delta) {
+  return xForm2.adjustTx(delta);
+}
+
+public Xform adjustTy(double delta) {
+  return xForm2.adjustTy(delta);
+}
+
+public Xform setTx(double delta) {
+  return xForm2.setTx(delta);
+}
+
+public Xform setTy(double delta) {
+  return xForm2.setTy(delta);
+}
+
+public Xform adjustRx(double delta) {
+  return xForm1.adjustRx(delta);
+}
+
+public Xform adjustRy(double delta) {
+  return xForm1.adjustRy(delta);
+}
+
+public Xform setRx(double delta) {
+  return xForm1.setRx(delta);
+}
+
+public Xform setRy(double delta) {
+  return xForm1.setRy(delta);
+}
+
 }

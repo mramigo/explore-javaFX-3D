@@ -46,54 +46,48 @@ import javafx.scene.transform.Rotate;
  */
 public class MoleculeFactory {
 
-static final PhongMaterial redMaterial = new PhongMaterial();
-static final PhongMaterial greenMaterial = new PhongMaterial();
-static final PhongMaterial blueMaterial = new PhongMaterial();
-static final PhongMaterial whiteMaterial = new PhongMaterial();
-static final PhongMaterial greyMaterial = new PhongMaterial();
+static final PhongMaterial redMaterial = new PhongMaterial(Color.DARKRED);
+static final PhongMaterial greenMaterial = new PhongMaterial(Color.DARKGREEN);
+static final PhongMaterial blueMaterial = new PhongMaterial(Color.DARKBLUE);
+static final PhongMaterial whiteMaterial = new PhongMaterial(Color.DARKGREY);
+static final PhongMaterial greyMaterial = new PhongMaterial(Color.WHITE);
 
-{
-  redMaterial.setDiffuseColor(Color.DARKRED);
+private static void addSpecular() {
   redMaterial.setSpecularColor(Color.RED);
-  greenMaterial.setDiffuseColor(Color.DARKGREEN);
   greenMaterial.setSpecularColor(Color.GREEN);
-  blueMaterial.setDiffuseColor(Color.DARKBLUE);
   blueMaterial.setSpecularColor(Color.BLUE);
-  greyMaterial.setDiffuseColor(Color.DARKGREY);
   greyMaterial.setSpecularColor(Color.GREY);
-  whiteMaterial.setDiffuseColor(Color.WHITE);
   whiteMaterial.setSpecularColor(Color.LIGHTBLUE);
 }
 
 public static Group buildAxes() {
-  Box xAxis = new Box(240.0, 1, 1);
-  Box yAxis = new Box(1, 240.0, 1);
-  Box zAxis = new Box(1, 1, 240.0);
+  addSpecular();
+  Box xAxis = new Box(240, 1, 1);
+  Box yAxis = new Box(1, 240, 1);
+  Box zAxis = new Box(1, 1, 240);
 
   xAxis.setMaterial(redMaterial);
   yAxis.setMaterial(greenMaterial);
   zAxis.setMaterial(blueMaterial);
 
-  Group axisGroup = new Group();
-  axisGroup.getChildren().addAll(xAxis, yAxis, zAxis);
-  return axisGroup;
+  return new Group(xAxis, yAxis, zAxis);
 }
 
 private static Xform createH(PhongMaterial sphereMaterial) {
-  Sphere sphere = new Sphere(30.0);
+  Sphere sphere = new Sphere(30);
   sphere.setMaterial(sphereMaterial);
-  sphere.setTranslateX(0.0);
+  sphere.setTranslateX(0);
   Xform h = new Xform(sphere);
-  h.setTx(100.0);
+  h.setTx(100);
   return h;
 }
 
 private static Cylinder createBond(PhongMaterial m) {
   Cylinder c = new Cylinder(5, 100);
   c.setMaterial(m);
-  c.setTranslateX(50.0);
+  c.setTranslateX(50);
   c.setRotationAxis(Rotate.Z_AXIS);
-  c.setRotate(90.0);
+  c.setRotate(90);
   return c;
 }
 
@@ -110,6 +104,7 @@ private static Cylinder createBond(PhongMaterial m) {
 //             [*] hydrogen2Sphere
 //         [*] bond2Cylinder
 public static Xform buildMolecule() {
+  addSpecular();
   Sphere oxygenSphere = new Sphere(40.0);
   oxygenSphere.setMaterial(redMaterial);
 
