@@ -45,7 +45,7 @@ import javafx.stage.Stage;
 /**
  * MoleculeSampleApp
  */
-public class Molecule extends Application {
+public class MoleculeApp extends Application {
 
 private void handleKeyboard(Scene scene, Camera camera, Group axes, Group molecule) {
   KeyboardHandler kh = new KeyboardHandler(camera);
