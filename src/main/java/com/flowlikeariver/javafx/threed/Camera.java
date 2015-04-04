@@ -3,7 +3,7 @@ package com.flowlikeariver.javafx.threed;
 import javafx.scene.PerspectiveCamera;
 
 public class Camera {
-public static final double DELTA_MULTIPLIER = 200.0;
+public static final double DELTA_MULTIPLIER = 200;
 
 private final PerspectiveCamera pc = new PerspectiveCamera(true);
 private final Xform xform3 = new Xform(pc);
@@ -12,12 +12,12 @@ private final Xform xForm1 = new Xform(xForm2);
 private final double cameraDistance = 450;
 
 public Camera() {
-  xform3.setRotateZ(180.0);
   pc.setNearClip(0.1);
-  pc.setFarClip(10000.0);
+  pc.setFarClip(10000);
   pc.setTranslateZ(-cameraDistance);
-  xForm1.setRotateY(320.0);
+  xForm1.setRotateY(320);
   xForm1.setRotateX(40);
+  xform3.setRotateZ(180);
 }
 
 /**
