@@ -39,27 +39,22 @@ import javafx.scene.Group;
 import javafx.scene.Scene;
 import static javafx.scene.input.KeyCode.S;
 import static javafx.scene.input.KeyCode.X;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
-/**
- * MoleculeSampleApp
- */
 public class MoleculeApp extends Application {
 
-private void handleKeyboard(Scene scene, Camera camera, Group axes, Group molecule) {
-  KeyboardHandler kh = new KeyboardHandler(camera);
-  scene.setOnKeyPressed(event -> {
-    if ((X == event.getCode()) && event.isControlDown()) {
-      axes.setVisible(!axes.isVisible());
-    }
-    else if ((S == event.getCode()) && event.isControlDown()) {
-      molecule.setVisible(!molecule.isVisible());
-    }
-    else {
-      kh.handleKeyboard(event);
-    }
-  });
+private void handleKeyboard(KeyboardHandler kh, KeyEvent event, Group axes, Group molecule) {
+  if ((X == event.getCode()) && event.isControlDown()) {
+    axes.setVisible(!axes.isVisible());
+  }
+  else if ((S == event.getCode()) && event.isControlDown()) {
+    molecule.setVisible(!molecule.isVisible());
+  }
+  else {
+    kh.handleKeyboard(event);
+  }
 }
 
 @Override
@@ -69,7 +64,9 @@ public void start(Stage primaryStage) {
   Scene scene = new Scene(new Group(axes, molecule), 1024, 768, true);
   scene.setFill(Color.IVORY);
   Camera camera = new Camera();
-  handleKeyboard(scene, camera, axes, molecule);
+  scene.setOnKeyPressed(event -> {
+    handleKeyboard(new KeyboardHandler(camera), event, axes, molecule);
+  });
   MouseHandler mh = new MouseHandler(camera);
   scene.setOnMousePressed(mh::recordMove);
   scene.setOnMouseDragged(mh::handleMouse);
