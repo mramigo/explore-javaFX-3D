@@ -31,7 +31,7 @@ public ComboBox<CullFace> cullFaceComboBox;
 public Slider rotateSlider;
 
 public View(Model model) {
-  meshView = new MeshView(createPyramid(200.0f));
+  meshView = new MeshView(createPrism(200f, 200f));
   meshView.materialProperty().bind(model.materialProperty());
   meshView.drawModeProperty().bind(model.drawModeProperty());
   meshView.cullFaceProperty().bind(model.cullFaceProperty());
@@ -75,11 +75,71 @@ public View(Model model) {
   scene = new Scene(root, 640, 480);
 }
 
-private double deg2rad(double deg) {
-  return deg * Math.PI / 180;
+private Mesh createPyramid(float length) {
+  TriangleMesh mesh = new TriangleMesh();
+  float unit = length / 2;
+  float third = (float) (unit / Math.sqrt(3));
+  mesh.getPoints().addAll(
+    -unit, 0, third, // O
+    unit, 0, third, // A
+    0, 0, -2 * third, // B
+    0, - (float) (third * 2 * Math.sqrt(2)), 0 // C
+  );
+
+  mesh.getTexCoords().addAll(
+    0.0f, 0.0f,
+    0.0f, 1.0f,
+    1.0f, 0.0f,
+    1.0f, 1.0f
+  );
+
+  mesh.getFaces().addAll(
+    0, 0, 2, 1, 1, 2, // OBA
+    0, 0, 3, 1, 2, 2, // OCB
+    0, 0, 1, 1, 3, 2, // OAC
+    1, 0, 2, 1, 3, 2 // ABC
+  );
+
+  mesh.getFaceSmoothingGroups().addAll(0, 0, 0, 0);
+  return mesh;
 }
 
-private Mesh createPyramid(float length) {
+private Mesh createPrism(float length, float height) {
+  TriangleMesh mesh = new TriangleMesh();
+  float unit = length / 2;
+  float third = (float) (unit / Math.sqrt(3));
+  mesh.getPoints().addAll(
+    -unit, 0, third, // O
+    unit, 0, third, // A
+    0, 0, -2 * third, // B
+    -unit, -height, third, // C
+    unit, -height, third, // D
+    0, -height, -2 * third // E
+  );
+
+  mesh.getTexCoords().addAll(
+    0.0f, 0.0f,
+    0.0f, 1.0f,
+    1.0f, 0.0f,
+    1.0f, 1.0f
+  );
+
+  mesh.getFaces().addAll(
+    0, 0, 1, 1, 2, 2, // OAB
+    0, 0, 3, 1, 1, 2, // OCA
+    1, 0, 3, 1, 4, 2, // ACD
+    0, 0, 2, 1, 5, 2, // OBE  
+    0, 0, 2, 1, 3, 2, // OBC
+    2, 0, 1, 1, 4, 2, // BAD
+    2, 0, 1, 1, 5, 2, // BAE
+    3, 0, 5, 1, 4, 2 // CED
+  );
+
+  mesh.getFaceSmoothingGroups().addAll(0, 0, 0, 0, 0, 0, 0, 0);
+  return mesh;
+}
+
+private Mesh createPyramidOriginal(float length) {
   TriangleMesh mesh = new TriangleMesh();
 
   mesh.getPoints().addAll(
