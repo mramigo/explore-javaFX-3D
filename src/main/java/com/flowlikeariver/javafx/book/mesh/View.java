@@ -129,9 +129,9 @@ private Mesh createPrism(float length, float height) {
     0, 0, 3, 1, 1, 2, // OCA
     1, 0, 3, 1, 4, 2, // ACD
     0, 0, 2, 1, 5, 2, // OBE  
-    0, 0, 2, 1, 3, 2, // OBC
+    0, 0, 5, 1, 3, 2, // OEC
     2, 0, 1, 1, 4, 2, // BAD
-    2, 0, 1, 1, 5, 2, // BAE
+    2, 0, 4, 1, 5, 2, // BDE
     3, 0, 5, 1, 4, 2 // CED
   );
 
